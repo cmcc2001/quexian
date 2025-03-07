@@ -13,6 +13,57 @@ with st.sidebar:
         type=["xlsx", "xls"],
         help="支持格式：XLSX/XLS"
     )
+if uploaded_file is not None:
+    try:
+        # 读取Excel文件
+        df = pd.read_excel(uploaded_file, engine='openpyxl')
+        
+        # 显示原始数据（带高亮）
+        st.header("数据预览")
+        with st.expander("点击展开/收起完整数据", expanded=True):
+            styled_df = df.style.highlight_min(
+                axis=0, 
+                color="#FF9999",  # 浅红色高亮
+                subset=df.select_dtypes(include='number').columns
+            )
+            st.dataframe(
+                styled_df,
+                height=400,
+                use_container_width=True
+            )
+
+        # 数值分析
+        st.header("数据分析")
+        numeric_df = df.select_dtypes(include='number')
+        
+        if not numeric_df.empty:
+            # 创建两列布局
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.subheader("各列最小值")
+                st.dataframe(
+                    numeric_df.min().rename("最小值"),
+                    use_container_width=True
+                )
+            
+            with col2:
+                st.subheader("全局最小值")
+                min_value = numeric_df.min().min()
+                min_column = numeric_df.min().idxmin()
+                st.metric(
+                    label="全表最小值",
+                    value=f"{min_value}",
+                    help=f"出现在列：{min_column}"
+                )
+        else:
+            st.warning("未检测到数值型数据列")
+
+    except Exception as e:
+        st.error(f"文件读取错误: {str(e)}")
+else:
+    st.info("👈 请在左侧上传Excel文件开始分析")
+
 formula_type = st.sidebar.selectbox(
     "测试方法",
     ("GS", "SS", "CP")
