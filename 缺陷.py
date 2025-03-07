@@ -6,7 +6,7 @@ import numpy as np
 
 # 设置标题
 st.sidebar.title("缺陷提取")
-uploaded_file = st.sidebar.selectbox(st.file_uploader(
+st.sidebar.selectbox(uploaded_file = st.file_uploader(
         "请选择Excel文件",
         type=["xlsx", "xls"],
         help="支持格式：XLSX/XLS"
