@@ -3,6 +3,7 @@ import math
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import xlrd
 
 if "results" not in st.session_state:
     st.session_state["results"] = {"GS": [], "SS": [], "CP": []}
