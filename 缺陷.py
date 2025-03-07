@@ -25,7 +25,7 @@ with st.sidebar:
 if uploaded_file is not None:
     try:
         # 读取Excel文件
-        df = pd.read_excel(uploaded_file, engine='openpyxl')
+        df = pd.read_excel(uploaded_file, engine='xlrd')
         
         # 显示原始数据
         st.header("📊 上传数据分析")
