@@ -3,7 +3,7 @@ import math
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import openpyxl
+
 
 # 设置标题
 st.sidebar.title("缺陷提取")
