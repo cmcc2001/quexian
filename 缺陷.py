@@ -13,8 +13,7 @@ with st.sidebar:
     # 文件上传组件
     uploaded_file = st.file_uploader(
         "上传Excel文件", 
-        type=["xlsx", "xls"],
-        help="支持XLS/XLSX格式"
+      
     )
     
     
