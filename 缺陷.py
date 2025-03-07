@@ -4,80 +4,60 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-# 设置标题
-st.sidebar.title("缺陷提取")
+if "results" not in st.session_state:
+    st.session_state["results"] = {"GS": [], "SS": [], "CP": []}
 with st.sidebar:
-    st.header("文件上传")
+    st.title("缺陷提取")
+    
+    # 文件上传组件
     uploaded_file = st.file_uploader(
-        "请选择Excel文件",
+        "上传Excel文件", 
         type=["xlsx", "xls"],
-        help="支持格式：XLSX/XLS"
+        help="支持XLS/XLSX格式"
+    )
+    
+    
+    formula_type = st.selectbox("测试方法", ("GS", "SS", "CP"))
+    defect_type = st.selectbox(
+        "提取类型",
+        ("氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit")
     )
 if uploaded_file is not None:
     try:
         # 读取Excel文件
         df = pd.read_excel(uploaded_file, engine='openpyxl')
         
-        # 显示原始数据（带高亮）
-        st.header("数据预览")
-        with st.expander("点击展开/收起完整数据", expanded=True):
+        # 显示原始数据
+        st.header("📊 上传数据分析")
+        with st.expander("数据预览", expanded=True):
+            # 高亮最小值
             styled_df = df.style.highlight_min(
-                axis=0, 
-                color="#FF9999",  # 浅红色高亮
+                axis=0,
+                color='#FF6961',  # 红色高亮
                 subset=df.select_dtypes(include='number').columns
             )
-            st.dataframe(
-                styled_df,
-                height=400,
-                use_container_width=True
-            )
-
-        # 数值分析
-        st.header("数据分析")
-        numeric_df = df.select_dtypes(include='number')
+            st.dataframe(styled_df, height=300)
         
-        if not numeric_df.empty:
-            # 创建两列布局
+        # 最小值分析
+        numeric_cols = df.select_dtypes(include='number')
+        if not numeric_cols.empty:
             col1, col2 = st.columns(2)
-            
             with col1:
                 st.subheader("各列最小值")
-                st.dataframe(
-                    numeric_df.min().rename("最小值"),
-                    use_container_width=True
-                )
-            
+                st.dataframe(numeric_cols.min().rename("最小值"))
             with col2:
+                global_min = numeric_cols.min().min()
                 st.subheader("全局最小值")
-                min_value = numeric_df.min().min()
-                min_column = numeric_df.min().idxmin()
                 st.metric(
-                    label="全表最小值",
-                    value=f"{min_value}",
-                    help=f"出现在列：{min_column}"
+                    label="最小值",
+                    value=f"{global_min:.4e}",
+                    help="全表最小值"
                 )
         else:
             st.warning("未检测到数值型数据列")
-
+    
     except Exception as e:
         st.error(f"文件读取错误: {str(e)}")
-else:
-    st.info("👈 请在左侧上传Excel文件开始分析")
-
-formula_type = st.sidebar.selectbox(
-    "测试方法",
-    ("GS", "SS", "CP")
-)
-
-type = st.sidebar.selectbox(
-    "提取类型",
-    ( "氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit")
-)
-
-if "results" not in st.session_state:
-    st.session_state["results"] = {"GS": [], "SS": [], "CP": []}
-
 #氧
 if formula_type == "GS" and type == "氧化物俘获电荷缺陷浓度ΔNot":
     st.header("栅扫描")
