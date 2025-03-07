@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xlrd
 
-if "results" not in st.session_state:
-    st.session_state["results"] = {"GS": [], "SS": [], "CP": []}
+
 with st.sidebar:
     st.title("缺陷提取")
     
@@ -58,6 +57,8 @@ if uploaded_file is not None:
     
     except Exception as e:
         st.error(f"文件读取错误: {str(e)}")
+if "results" not in st.session_state:
+    st.session_state["results"] = {"GS": [], "SS": [], "CP": []}
 #氧
 if formula_type == "GS" and type == "氧化物俘获电荷缺陷浓度ΔNot":
     st.header("栅扫描")
