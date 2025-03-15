@@ -105,6 +105,9 @@ if formula_type == "GS" and type == "界面态陷阱浓度ΔNit":
     VBE = 1
     k = 1.38e-23  # 玻尔兹曼常数 (J/K)
     T = 1
+    Speak = 1
+    σ = 1
+    Vth = 1
     if "table_data2" not in st.session_state:
         # 初始化一个空表格
         st.session_state["table_data2"] = pd.DataFrame(columns=["剂量(krad)", "ΔNit"])
@@ -112,9 +115,7 @@ if formula_type == "GS" and type == "界面态陷阱浓度ΔNit":
     # 输入变量
     st.sidebar.subheader("输入参数")
     ΔIpeak = st.sidebar.number_input("输入 ΔIpeak（单位：A）", value=1.0)
-    Speak = st.sidebar.number_input("输入 Speak（单位：A）", value=1.0)
-    σ = st.sidebar.number_input("输入 σ（单位：A）", value=1.0)
-    Vth = st.sidebar.number_input("输入 Vth（单位：A）", value=1.0)
+   
     # 计算结果
     if st.button("计算"):
         try:
