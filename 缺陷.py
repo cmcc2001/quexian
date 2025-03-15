@@ -9,54 +9,14 @@ import xlrd
 with st.sidebar:
     st.title("缺陷提取")
     
-    # 文件上传组件
-    uploaded_file = st.file_uploader(
-        "上传Excel文件", 
-      
-    )
-    
+ 
     
     formula_type = st.selectbox("测试方法", ("GS", "SS", "CP"))
     defect_type = st.selectbox(
         "提取类型",
         ("氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit")
     )
-if uploaded_file is not None:
-    try:
-        # 读取Excel文件
-        df = pd.read_excel(uploaded_file, engine='xlrd')
-        
-        # 显示原始数据
-        st.header("📊 上传数据分析")
-        with st.expander("数据预览", expanded=True):
-            # 高亮最小值
-            styled_df = df.style.highlight_min(
-                axis=0,
-                color='#FF6961',  # 红色高亮
-                subset=df.select_dtypes(include='number').columns
-            )
-            st.dataframe(styled_df, height=300)
-        
-        # 最小值分析
-        numeric_cols = df.select_dtypes(include='number')
-        if not numeric_cols.empty:
-            col1, col2 = st.columns(2)
-            with col1:
-                st.subheader("各列最小值")
-                st.dataframe(numeric_cols.min().rename("最小值"))
-            with col2:
-                global_min = numeric_cols.min().min()
-                st.subheader("全局最小值")
-                st.metric(
-                    label="最小值",
-                    value=f"{global_min:.4e}",
-                    help="全表最小值"
-                )
-        else:
-            st.warning("未检测到数值型数据列")
-    
-    except Exception as e:
-        st.error(f"文件读取错误: {str(e)}")
+
 if "results" not in st.session_state:
     st.session_state["results"] = {"GS": [], "SS": [], "CP": []}
 #氧
