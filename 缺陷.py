@@ -13,7 +13,7 @@ st.sidebar.header("参数选择")
 # 第一步选择公式类型
 formula_type = st.sidebar.selectbox(
     "选择测试方法",
-    ["GS", "其他方法"],  # 可以扩展其他方法
+    ["GS", "SS","CP","CP","1/f"], 
     key="formula_type"
 )
 
