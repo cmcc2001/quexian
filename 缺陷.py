@@ -119,7 +119,7 @@ method_configs = {
                 "key": "ΔVmg",
                 "default": 1.0
             }],
-            "calc_function": lambda ΔVmg: (6.91E-6* ΔVmg) / 1.6e-19, 
+            "calc_function": lambda ΔVmg: (6.91E-10* ΔVmg) / 1.6e-19, 
             "table_key": "gs_table1",
             "result_col": "ΔNot"
         },
@@ -131,7 +131,7 @@ method_configs = {
                 "default": 1.0,
                 "format": "%e"
             }],
-            "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6E-19 * 6.16E-10 * 1.5E16 * 1 * 1E-9 * math.exp((1.6e-19*0.5)/(2*1.38e-23*298))),
+            "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6E-19 * 6.16E-6 * 1.5E10 * 1 * 1E-7 * math.exp((1.6e-19*0.5)/(2*1.38e-23*298))),
             "table_key": "gs_table2",
             "result_col": "ΔNit"
         }
