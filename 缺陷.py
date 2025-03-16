@@ -136,7 +136,7 @@ method_configs = {
         }
     },
     "SS": {
-        "SS缺陷类型1": { 
+        "氧化物俘获电荷缺陷浓度ΔNot": { 
             "formula": r"I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}}",
             "inputs": [
                 {"label": "参数A", "key": "A", "default": 10.0},
@@ -147,7 +147,7 @@ method_configs = {
             "table_key": "ss_table1",
             "result_col": "ΔX"
         },
-        "SS缺陷类型2": {  # 示例配置，根据实际需求修改
+        "界面态陷阱浓度ΔNit": {  # 示例配置，根据实际需求修改
             "formula": r"\Delta Y = \sqrt{D \cdot E}",
             "inputs": [
                 {"label": "参数D", "key": "D", "default": 9.0},
