@@ -6,136 +6,165 @@ import numpy as np
 import xlrd
 
 
-
-# 新增参数选择部分 -----------------------------------------------------------------
+# 参数选择部分
 st.sidebar.header("参数选择")
 
-# 第一步选择公式类型
+# 测试方法选择
 formula_type = st.sidebar.selectbox(
     "选择测试方法",
-    ["GS", "SS","CP","CP","1/f"], 
+    ["GS", "SS"],  # 新增SS选项
     key="formula_type"
 )
 
-# 第二步选择缺陷类型（仅在 GS 方法下显示）
-if formula_type == "GS":
-    defect_type = st.sidebar.selectbox(  # 避免使用 type 作为变量名
-        "选择缺陷类型",
-        ["氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit"],
-        key="defect_type"
-    )
-else:
-    defect_type = None
-# --------------------------------------------------------------------------------
+# 缺陷类型选择
+defect_types = {
+    "GS": ["氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit"],
+    "SS": ["SS缺陷类型1", "SS缺陷类型2"]  # 新增SS的缺陷类型
+}
 
-def handle_calculation(formula, inputs, calc_function, table_key, result_col):
-    st.header("栅扫描")
+defect_type = st.sidebar.selectbox(
+    "选择缺陷类型",
+    defect_types[formula_type],
+    key="defect_type"
+)
+
+def handle_calculation(config):
+    """通用计算处理函数"""
+    st.header(f"{formula_type}扫描")
     st.write("求解公式：")
-    st.latex(formula)
+    st.latex(config["formula"])
 
-    if table_key not in st.session_state:
-        st.session_state[table_key] = pd.DataFrame(columns=["剂量(krad)", result_col])
+    # 初始化表格
+    if config["table_key"] not in st.session_state:
+        st.session_state[config["table_key"]] = pd.DataFrame(
+            columns=["剂量(krad)", config["result_col"]]
+        )
 
+    # 参数输入
     st.sidebar.subheader("输入参数")
     input_values = {}
-    for param in inputs:
+    for param in config["inputs"]:
         input_values[param['key']] = st.sidebar.number_input(
-            param['label'], 
+            param['label'],
             value=param['default'],
             format=param.get('format', "%f")
         )
 
+    # 计算功能
     if st.button("计算"):
         try:
-            result = calc_function(**input_values)
-            new_row = {"剂量(krad)": "", result_col: result}
-            st.session_state[table_key] = pd.concat(
-                [st.session_state[table_key], pd.DataFrame([new_row])],
-                ignore_index=True
-            )
+            result = config["calc_function"](**input_values)
+            new_row = {
+                "剂量(krad)": "",
+                config["result_col"]: result
+            }
+            st.session_state[config["table_key"]] = pd.concat([
+                st.session_state[config["table_key"]],
+                pd.DataFrame([new_row])
+            ], ignore_index=True)
         except Exception as e:
             st.error(f"计算出错：{e}")
 
+    # 表格编辑
     st.write("编辑表格内容：")
     updated_data = []
-    df = st.session_state[table_key]
+    df = st.session_state[config["table_key"]]
     
     for index, row in df.iterrows():
         cols = st.columns(2)
         with cols[0]:
-            dose = st.text_input(f"剂量(krad) [行{index+1}]", 
-                               value=row["剂量(krad)"], 
-                               key=f"dose_{table_key}_{index}")
+            dose = st.text_input(
+                f"剂量(krad) [行{index+1}]",
+                value=row["剂量(krad)"],
+                key=f"dose_{config['table_key']}_{index}"
+            )
         with cols[1]:
-            val = st.number_input(f"{result_col} [行{index+1}]", 
-                                value=row[result_col],
-                                key=f"val_{table_key}_{index}")
-        updated_data.append({"剂量(krad)": dose, result_col: val})
+            val = st.number_input(
+                f"{config['result_col']} [行{index+1}]",
+                value=row[config['result_col']],
+                key=f"val_{config['table_key']}_{index}"
+            )
+        updated_data.append({
+            "剂量(krad)": dose,
+            config['result_col']: val
+        })
     
-    st.session_state[table_key] = pd.DataFrame(updated_data)
+    st.session_state[config["table_key"]] = pd.DataFrame(updated_data)
     
+    # 显示表格
     st.write("更新后的表格：")
-    st.dataframe(st.session_state[table_key])
+    st.dataframe(st.session_state[config["table_key"]])
 
-    if st.button("绘制图形", key=f"plot_{table_key}"):
-        if not st.session_state[table_key].empty:
+    # 绘图功能
+    if st.button("绘制图形", key=f"plot_{config['table_key']}"):
+        if not st.session_state[config["table_key"]].empty:
             fig, ax = plt.subplots()
-            df = st.session_state[table_key]
-            ax.plot(df["剂量(krad)"], df[result_col], 'bo-')
+            df = st.session_state[config["table_key"]]
+            ax.plot(df["剂量(krad)"], df[config['result_col']], 'bo-')
             ax.set_xlabel("剂量(krad)")
-            ax.set_ylabel(result_col)
+            ax.set_ylabel(config['result_col'])
             st.pyplot(fig)
         else:
             st.warning("表格为空，无法绘制图形！")
 
-# ΔNot 计算逻辑
-def calc_delta_not(ΔVmg):
-    q = 1.6e-19
-    Cox = 1
-    return Cox * ΔVmg / q
-
-# ΔNit 计算逻辑
-def calc_delta_nit(ΔIpeak):
-    q = 1.6e-19
-    ni = 1
-    VBE = 1
-    k = 1.38e-23
-    T = 1
-    Speak = 1
-    σ = 1
-    Vth = 1
-    
-    exp_term = math.exp((q * VBE) / 2 * (k * T))
-    denominator = q * Speak * ni * σ * Vth * exp_term
-    return (2 * ΔIpeak) / denominator
-
-# 主逻辑 ------------------------------------------------------------------------
-if formula_type == "GS":
-    if defect_type == "氧化物俘获电荷缺陷浓度ΔNot":
-        handle_calculation(
-            formula=r"\mathrm{\Delta}N_{ot}=\frac{Cox\cdot\mathrm{\Delta}V_{mg}}{q}",
-            inputs=[{
-                'label': "输入 ΔVmg（单位：V）",
-                'key': "ΔVmg",
-                'default': 1.0
+# 不同测试方法的配置
+method_configs = {
+    "GS": {
+        "氧化物俘获电荷缺陷浓度ΔNot": {
+            "formula": r"\mathrm{\Delta}N_{ot}=\frac{Cox\cdot\mathrm{\Delta}V_{mg}}{q}",
+            "inputs": [{
+                "label": "输入 ΔVmg（单位：V）",
+                "key": "ΔVmg",
+                "default": 1.0
             }],
-            calc_function=calc_delta_not,
-            table_key="table_data1",
-            result_col="ΔNot"
-        )
-    elif defect_type == "界面态陷阱浓度ΔNit":
-        handle_calculation(
-            formula=r"\Delta N_{it}=\frac{2\Delta I_{peak}}{q\cdot S_{peak}\cdot n_i\cdot\sigma\cdot\nu_{th}exp{\left(\frac{qV_{BE}}{2kT}\right)}}",
-            inputs=[{
-                'label': "输入 ΔIpeak（单位：A）",
-                'key': "ΔIpeak",
-                'default': 1.0,
-                'format': "%e"
+            "calc_function": lambda ΔVmg: (1 * ΔVmg) / 1.6e-19,  # Cox=1
+            "table_key": "gs_table1",
+            "result_col": "ΔNot"
+        },
+        "界面态陷阱浓度ΔNit": {
+            "formula": r"\Delta N_{it}=\frac{2\Delta I_{peak}}{q\cdot S_{peak}\cdot n_i\cdot\sigma\cdot\nu_{th}exp{\left(\frac{qV_{BE}}{2kT}\right)}}",
+            "inputs": [{
+                "label": "输入 ΔIpeak（单位：A）",
+                "key": "ΔIpeak",
+                "default": 1.0,
+                "format": "%e"
             }],
-            calc_function=calc_delta_nit,
-            table_key="table_data2",
-            result_col="ΔNit"
-        )
+            "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6e-19 * 1 * 1 * 1 * 1 * math.exp((1.6e-19*1)/(2*1.38e-23*1))),
+            "table_key": "gs_table2",
+            "result_col": "ΔNit"
+        }
+    },
+    "SS": {
+        "SS缺陷类型1": {  # 示例配置，根据实际需求修改
+            "formula": r"\Delta X = \frac{A \cdot B}{C}",
+            "inputs": [
+                {"label": "参数A", "key": "A", "default": 10.0},
+                {"label": "参数B", "key": "B", "default": 5.0},
+                {"label": "参数C", "key": "C", "default": 2.0}
+            ],
+            "calc_function": lambda A, B, C: (A * B) / C,
+            "table_key": "ss_table1",
+            "result_col": "ΔX"
+        },
+        "SS缺陷类型2": {  # 示例配置，根据实际需求修改
+            "formula": r"\Delta Y = \sqrt{D \cdot E}",
+            "inputs": [
+                {"label": "参数D", "key": "D", "default": 9.0},
+                {"label": "参数E", "key": "E", "default": 4.0}
+            ],
+            "calc_function": lambda D, E: math.sqrt(D * E),
+            "table_key": "ss_table2",
+            "result_col": "ΔY"
+        }
+    }
+}
+
+# 主程序逻辑
+if formula_type in method_configs:
+    config = method_configs[formula_type][defect_type]
+    handle_calculation(config)
+else:
+    st.info("暂未实现该方法的计算")
 
 if formula_type == "SS":
     st.header("亚阈值扫描")
