@@ -136,8 +136,8 @@ method_configs = {
         }
     },
     "SS": {
-        "SS缺陷类型1": {  # 示例配置，根据实际需求修改
-            "formula": r"\Delta X = \frac{A \cdot B}{C}",
+        "SS缺陷类型1": { 
+            "formula": r"I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}}",
             "inputs": [
                 {"label": "参数A", "key": "A", "default": 10.0},
                 {"label": "参数B", "key": "B", "default": 5.0},
