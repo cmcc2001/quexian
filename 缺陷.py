@@ -122,7 +122,7 @@ method_configs = {
             "calc_function": lambda ΔVmg: (6.91E-10* ΔVmg) / 1.6e-19, 
             "table_key": "gs_table1",
             "result_col": "ΔNot",
-            "format": "%e"
+            "format": "{:.2e}"
         },
         "界面态陷阱浓度ΔNit": {
             "formula": r"\Delta N_{it}=\frac{2\Delta I_{peak}}{q\cdot S_{peak}\cdot n_i\cdot\sigma\cdot\nu_{th}exp{\left(\frac{qV_{BE}}{2kT}\right)}}",
@@ -134,7 +134,7 @@ method_configs = {
             "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6E-19 * 6.16E-6 * 1.5E10 * 1 * 1E-7 * math.exp((1.6e-19*0.5)/(2*1.38e-23*298))),
             "table_key": "gs_table2",
             "result_col": "ΔNit",
-            "format": "%e"
+            "format": "{:.2e}"
         }
     },
     "SS": {
