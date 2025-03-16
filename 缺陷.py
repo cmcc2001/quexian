@@ -5,17 +5,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xlrd
 
+import pandas as pd
+import streamlit as st
+import matplotlib.pyplot as plt
+import math
+
+# 新增参数选择部分 -----------------------------------------------------------------
+st.sidebar.header("参数选择")
+
+# 第一步选择公式类型
+formula_type = st.sidebar.selectbox(
+    "选择测试方法",
+    ["GS", "其他方法"],  # 可以扩展其他方法
+    key="formula_type"
+)
+
+# 第二步选择缺陷类型（仅在 GS 方法下显示）
+if formula_type == "GS":
+    defect_type = st.sidebar.selectbox(  # 避免使用 type 作为变量名
+        "选择缺陷类型",
+        ["氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit"],
+        key="defect_type"
+    )
+else:
+    defect_type = None
+# --------------------------------------------------------------------------------
+
 def handle_calculation(formula, inputs, calc_function, table_key, result_col):
-    # 显示公式
     st.header("栅扫描")
     st.write("求解公式：")
     st.latex(formula)
 
-    # 初始化表格
     if table_key not in st.session_state:
         st.session_state[table_key] = pd.DataFrame(columns=["剂量(krad)", result_col])
 
-    # 侧边栏输入参数
     st.sidebar.subheader("输入参数")
     input_values = {}
     for param in inputs:
@@ -25,7 +48,6 @@ def handle_calculation(formula, inputs, calc_function, table_key, result_col):
             format=param.get('format', "%f")
         )
 
-    # 计算并更新表格
     if st.button("计算"):
         try:
             result = calc_function(**input_values)
@@ -37,7 +59,6 @@ def handle_calculation(formula, inputs, calc_function, table_key, result_col):
         except Exception as e:
             st.error(f"计算出错：{e}")
 
-    # 表格编辑功能
     st.write("编辑表格内容：")
     updated_data = []
     df = st.session_state[table_key]
@@ -56,11 +77,9 @@ def handle_calculation(formula, inputs, calc_function, table_key, result_col):
     
     st.session_state[table_key] = pd.DataFrame(updated_data)
     
-    # 显示表格
     st.write("更新后的表格：")
     st.dataframe(st.session_state[table_key])
 
-    # 绘图功能
     if st.button("绘制图形", key=f"plot_{table_key}"):
         if not st.session_state[table_key].empty:
             fig, ax = plt.subplots()
@@ -89,14 +108,13 @@ def calc_delta_nit(ΔIpeak):
     σ = 1
     Vth = 1
     
-    # 注意保持原计算逻辑
-    exp_term = math.exp((q * VBE) / 2 * (k * T))  # 保留原始计算顺序
+    exp_term = math.exp((q * VBE) / 2 * (k * T))
     denominator = q * Speak * ni * σ * Vth * exp_term
     return (2 * ΔIpeak) / denominator
 
-# 根据选择调用不同计算
+# 主逻辑 ------------------------------------------------------------------------
 if formula_type == "GS":
-    if type == "氧化物俘获电荷缺陷浓度ΔNot":
+    if defect_type == "氧化物俘获电荷缺陷浓度ΔNot":
         handle_calculation(
             formula=r"\mathrm{\Delta}N_{ot}=\frac{Cox\cdot\mathrm{\Delta}V_{mg}}{q}",
             inputs=[{
@@ -108,7 +126,7 @@ if formula_type == "GS":
             table_key="table_data1",
             result_col="ΔNot"
         )
-    elif type == "界面态陷阱浓度ΔNit":
+    elif defect_type == "界面态陷阱浓度ΔNit":
         handle_calculation(
             formula=r"\Delta N_{it}=\frac{2\Delta I_{peak}}{q\cdot S_{peak}\cdot n_i\cdot\sigma\cdot\nu_{th}exp{\left(\frac{qV_{BE}}{2kT}\right)}}",
             inputs=[{
@@ -121,6 +139,8 @@ if formula_type == "GS":
             table_key="table_data2",
             result_col="ΔNit"
         )
+else:
+    st.info("暂未实现其他方法的计算")
 if formula_type == "SS":
     st.header("亚阈值扫描")
     st.write("求解公式：")
