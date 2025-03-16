@@ -118,6 +118,7 @@ method_configs = {
                 "label": "输入 ΔVmg（单位：V）",
                 "key": "ΔVmg",
                 "default": 1.0
+                "format": "%e"
             }],
             "calc_function": lambda ΔVmg: (6.91E-10* ΔVmg) / 1.6e-19, 
             "table_key": "gs_table1",
