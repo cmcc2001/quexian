@@ -97,8 +97,8 @@ def handle_calculation(config):
     st.write("更新后的表格：")
     st.dataframe(st.session_state[config["table_key"]])
     if config['result_col'] in ["ΔNot", "ΔNit"]:
-    formatted_df = df.style.format({
-        config['result_col']: "{:.2e}"  # 统一格式
+        formatted_df = df.style.format({
+            config['result_col']: "{:.2e}"  # 统一格式
     })
 
     # 绘图功能
