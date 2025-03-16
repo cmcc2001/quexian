@@ -12,14 +12,16 @@ st.sidebar.header("参数选择")
 # 测试方法选择
 formula_type = st.sidebar.selectbox(
     "选择测试方法",
-    ["GS", "SS"],  # 新增SS选项
+    ["GS", "SS","CP","1/f"],  
     key="formula_type"
 )
 
 # 缺陷类型选择
 defect_types = {
     "GS": ["氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit"],
-    "SS": ["SS缺陷类型1", "SS缺陷类型2"]  # 新增SS的缺陷类型
+    "SS": ["氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit"],
+    "CP": ["氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit"],
+    "1/f": ["氧化物俘获电荷缺陷浓度ΔNot", "界面态陷阱浓度ΔNit"]
 }
 
 defect_type = st.sidebar.selectbox(
@@ -30,7 +32,7 @@ defect_type = st.sidebar.selectbox(
 
 def handle_calculation(config):
     """通用计算处理函数"""
-    st.header(f"{formula_type}扫描")
+    st.header(f"{formula_type}测试")
     st.write("求解公式：")
     st.latex(config["formula"])
 
@@ -117,7 +119,7 @@ method_configs = {
                 "key": "ΔVmg",
                 "default": 1.0
             }],
-            "calc_function": lambda ΔVmg: (1 * ΔVmg) / 1.6e-19,  # Cox=1
+            "calc_function": lambda ΔVmg: (6.91E-6* ΔVmg) / 1.6e-19, 
             "table_key": "gs_table1",
             "result_col": "ΔNot"
         },
@@ -129,7 +131,7 @@ method_configs = {
                 "default": 1.0,
                 "format": "%e"
             }],
-            "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6e-19 * 1 * 1 * 1 * 1 * math.exp((1.6e-19*1)/(2*1.38e-23*1))),
+            "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6E-19 * 6.16E-10 * 1.5E16 * 1 * 1E-9 * math.exp((1.6e-19*0.5)/(2*1.38e-23*298))),
             "table_key": "gs_table2",
             "result_col": "ΔNit"
         }
@@ -166,6 +168,3 @@ if formula_type in method_configs:
 else:
     st.info("暂未实现该方法的计算")
 
-if formula_type == "SS":
-    st.header("亚阈值扫描")
-    st.write("求解公式：")
