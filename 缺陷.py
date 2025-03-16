@@ -96,6 +96,10 @@ def handle_calculation(config):
     # 显示表格
     st.write("更新后的表格：")
     st.dataframe(st.session_state[config["table_key"]])
+    if config['result_col'] in ["ΔNot", "ΔNit"]:
+    formatted_df = df.style.format({
+        config['result_col']: "{:.2e}"  # 统一格式
+    })
 
     # 绘图功能
     if st.button("绘制图形", key=f"plot_{config['table_key']}"):
@@ -121,8 +125,7 @@ method_configs = {
             }],
             "calc_function": lambda ΔVmg: (6.91E-10* ΔVmg) / 1.6e-19, 
             "table_key": "gs_table1",
-            "result_col": "ΔNot",
-            "format": "{:.2e}"
+            "result_col": "ΔNot"
         },
         "界面态陷阱浓度ΔNit": {
             "formula": r"\Delta N_{it}=\frac{2\Delta I_{peak}}{q\cdot S_{peak}\cdot n_i\cdot\sigma\cdot\nu_{th}exp{\left(\frac{qV_{BE}}{2kT}\right)}}",
@@ -133,8 +136,7 @@ method_configs = {
             }],
             "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6E-19 * 6.16E-6 * 1.5E10 * 1 * 1E-7 * math.exp((1.6e-19*0.5)/(2*1.38e-23*298))),
             "table_key": "gs_table2",
-            "result_col": "ΔNit",
-            "format": "{:.2e}"
+            "result_col": "ΔNit"
         }
     },
     "SS": {
