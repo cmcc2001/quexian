@@ -137,12 +137,7 @@ method_configs = {
     },
     "SS": {
         "氧化物俘获电荷缺陷浓度ΔNot": { 
-            "left": r"""
-                I_{d}(th) = I_{do}(V_d) e^{\beta V_{th}} (\beta V_{th} - 0.5)
-                """,
-                "right": r"""
-                I_{mg} = I_{do}(V_d) e^{\beta \frac{V_{th}}{2}} (\beta \frac{V_{th}}{2} - 0.5)
-                """,
+            "formula": r"I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}",
             "inputs": [
                 {"label": "输入Vth（单位：V）", "key": "th", "default": 10.0},
                 {"label": "输入Id(th)（单位：A）", "key": "Id(th)", "default": 10.0}
