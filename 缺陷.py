@@ -136,8 +136,7 @@ if formula_type == "GS":
             table_key="table_data2",
             result_col="ΔNit"
         )
-else:
-    st.info("暂未实现其他方法的计算")
+
 if formula_type == "SS":
     st.header("亚阈值扫描")
     st.write("求解公式：")
