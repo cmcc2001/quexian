@@ -96,11 +96,13 @@ def handle_calculation(config):
     # 显示表格
     st.write("更新后的表格：")
     st.dataframe(st.session_state[config["table_key"]])
-    if config['result_col'] in ["ΔNot", "ΔNit"]:
+   if config['result_col'] in ["ΔNot", "ΔNit"]:
         formatted_df = df.style.format({
-            config['result_col']: "{:.2e}"  # 统一格式
-    })
-
+            config['result_col']: "{:.2e}"  # 两位小数科学计数法
+        })
+        st.dataframe(formatted_df)
+    else:
+        st.dataframe(df)
     # 绘图功能
     if st.button("绘制图形", key=f"plot_{config['table_key']}"):
         if not st.session_state[config["table_key"]].empty:
