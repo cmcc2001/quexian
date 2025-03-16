@@ -5,10 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xlrd
 
-import pandas as pd
-import streamlit as st
-import matplotlib.pyplot as plt
-import math
+
 
 # 新增参数选择部分 -----------------------------------------------------------------
 st.sidebar.header("参数选择")
