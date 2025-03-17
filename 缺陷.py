@@ -149,9 +149,9 @@ method_configs = {
                 {"label": "输入Vth（单位：V）", "key": "th", "default": 1},
                 {"label": "输入Id(th)（单位：A）", "key": "Id(th)", "default": 1}
             ],
-            "calc_function": lambda Vth, Id(th): (Id(th))/(math.exp(())),
+            "calc_function": lambda Vth, Id(th): (Id(th))/(math.exp((3.89E-7*Vth)*(3.89E-7*Vth)^-0.5)),
             "table_key": "ss_table1",
-            "result_col": "ΔX"
+            "result_col": "Ido(Vd)"
         },
         "界面态陷阱浓度ΔNit": {  # 示例配置，根据实际需求修改
             "formula": r"\Delta Y = \sqrt{D \cdot E}",
