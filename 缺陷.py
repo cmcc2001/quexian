@@ -143,7 +143,7 @@ method_configs = {
     \begin{aligned}
     I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}} \\
     I_{mg}=I_{do}\left(V_d\right)e^{\left(\beta\frac{V_{th}}{2}\right)\bullet\left(\beta\frac{V_{th}}{2}\right)^{-1/2}}\\
-     \Delta V_{ot}=\frac{-q\Delta N_{ot}}{C_{ox}}
+\Delta V_{ot}=\frac{-q\Delta N_{ot}}{C_{ox}}
     \end{aligned}
     """,
     "inputs": [
