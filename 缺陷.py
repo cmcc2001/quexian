@@ -157,61 +157,7 @@ method_configs = {
     }
 }
 
-# 新增计算函数
-def calculate_ss_parameters(Vth, Id_th):
-    """
-    计算SS测试中的Ido(Vd)和Img
-    参数：
-    - Vth: 阈值电压 (V)
-    - Id_th: 阈值电流 (A)
-    返回：
-    - Ido_Vd: Ido(Vd) 计算结果 (A)
-    - Img: Img 计算结果 (A)
-    """
-    beta = 3.89e-7  # 定义β值
-
-    # 计算Ido(Vd)
-    exponent_ido = (beta * Vth) * (beta * Vth)**(-0.5)
-    Ido_Vd = Id_th / math.exp(exponent_ido)
-
-    # 计算Img
-    exponent_img = (beta * (Vth / 2)) * (beta * (Vth / 2))**(-0.5)
-    Img = Ido_Vd * math.exp(exponent_img)
-
-    return Ido_Vd, Img
-
-# 修改handle_calculation函数以支持多结果列
-def handle_calculation(config):
-    """通用计算处理函数"""
-    st.header(f"{formula_type}测试")
-    st.write("求解公式：")
-
-    # 显示公式（两列布局）
-    if isinstance(config["formula"], dict):
-        cols = st.columns(2)
-        with cols[0]:
-            st.latex(config["formula"]["left"])
-        with cols[1]:
-            st.latex(config["formula"]["right"])
-    else:
-        st.latex(config["formula"])
-
-    # 初始化表格
-    if config["table_key"] not in st.session_state:
-        st.session_state[config["table_key"]] = pd.DataFrame(
-            columns=["剂量(krad)"] + config["result_cols"]
-        )
-
-    # 参数输入
-    st.sidebar.subheader("输入参数")
-    input_values = {}
-    for param in config["inputs"]:
-        input_values[param['key']] = st.sidebar.number_input(
-            param['label'],
-            value=param['default'],
-            format=param.get('format', "%f")
-        ),
-
+   
        
         "界面态陷阱浓度ΔNit": {  # 示例配置，根据实际需求修改
             "formula": r"\Delta Y = \sqrt{D \cdot E}",
