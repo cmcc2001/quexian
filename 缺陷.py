@@ -152,8 +152,8 @@ method_configs = {
     "calc_function": lambda Vth, Id_th: Id_th / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5),
     "table_key": "ss_table1",
     "result_cols": ["Ido_Vd"]
-}
-        },
+},
+       
         "界面态陷阱浓度ΔNit": {  # 示例配置，根据实际需求修改
             "formula": r"\Delta Y = \sqrt{D \cdot E}",
             "inputs": [
@@ -165,7 +165,7 @@ method_configs = {
             "result_col": "ΔY"
         }
     }
-}
+
 
 # 主程序逻辑
 if formula_type in method_configs:
