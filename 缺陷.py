@@ -147,11 +147,12 @@ method_configs = {
     """,
     "inputs": [
         {"label": "输入Vth（单位：V）", "key": "Vth", "default": 1.0},
-        {"label": "输入Id_th（单位：A）", "key": "Id_th", "default": 1e-6, "format": "%e"}
+        {"label": "输入Id_th（单位：A）", "key": "Id_th", "default": 1e-6, }
     ],
-    "calc_function": lambda Vth, Id_th: Id_th / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5),
+    "calc_function": lambda Vth, Id_th:(Id_th*math.exp((1.95e-7*Vth) * (1.95e-7*Vth)**-0.5) / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5)),
+           
     "table_key": "ss_table1",
-    "result_col": ["Ido_Vd"]
+    "result_col": ["Img"]
 },
    
        
