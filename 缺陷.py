@@ -141,8 +141,8 @@ method_configs = {
        "氧化物俘获电荷缺陷浓度ΔNot": { 
     "formula": r"""
     \begin{aligned}
-    I_d(th) &= I_{do}(V_d) \cdot e^{\beta V_{th} \cdot (\beta V_{th})^{-1/2} \\
-    I_{mg} &= I_{do}(V_d) \cdot e^{\beta \frac{V_{th}}{2} \cdot \left(\beta \frac{V_{th}}{2}\right)^{-1/2}
+    I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}} \\
+    I_{mg}=I_{do}\left(V_d\right)e^{\left(\beta\frac{V_{th}}{2}\right)\bullet\left(\beta\frac{V_{th}}{2}\right)^{-1/2}}
     \end{aligned}
     """,
     "inputs": [
