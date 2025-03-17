@@ -170,7 +170,7 @@ method_configs = {
     },
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
-            "formula": r"\mathrm{\Delta}N_{ot}=\frac{Cox\cdot\mathrm{\Delta}V_{mg}}{q}",
+            "formula": r"\Delta V_{ot}=\frac{q\Delta N_{ot}}{C_{ox}}",
             "inputs": [{
                 "label": "输入 ΔVmg（单位：V）",
                 "key": "ΔVmg",
