@@ -165,7 +165,7 @@ method_configs = {
             "result_col": "ΔY"
         }
     }
-
+}
 
 # 主程序逻辑
 if formula_type in method_configs:
