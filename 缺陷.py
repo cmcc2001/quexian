@@ -168,6 +168,30 @@ method_configs = {
             "result_col": "ΔY"
         }
     }
+    "CP": {
+        "氧化物俘获电荷缺陷浓度ΔNot": {
+            "formula": r"\mathrm{\Delta}N_{ot}=\frac{Cox\cdot\mathrm{\Delta}V_{mg}}{q}",
+            "inputs": [{
+                "label": "输入 ΔVmg（单位：V）",
+                "key": "ΔVmg",
+                "default": 1.0
+            }],
+            "calc_function": lambda ΔVmg: (6.91E-10* ΔVmg) / 1.6e-19, 
+            "table_key": "gs_table1",
+            "result_col": "ΔNot"
+        },
+        "界面态陷阱浓度ΔNit": {
+            "formula": r"{\mathrm{\Delta N}}_{it}=\frac{\mathrm{\Delta}I_{cpmax}}{q\times f\times A_g}",
+            "inputs": [{
+                "label": "输入ΔIcpmax（单位：A）",
+                "key": "ΔIcpmax",
+                "default": 1.0        
+            }],
+            "calc_function": lambda ΔIcpmax: (ΔIcpmax) / (1.6E-19 *1E6*3.3912E-6),
+            "table_key": "gs_table2",
+            "result_col": "ΔNit"
+        }
+    },
 }
 
 # 主程序逻辑
