@@ -181,7 +181,7 @@ method_configs = {
                 "key": "ΔNit",
                 "default": 1.0     
             }],
-            "calc_function": lambda ΔVth,ΔNit: ((6.91E-10* ΔVth) / 1.6e-19)-ΔNit, 
+            "calc_function": lambda ΔVth,ΔNit: (((6.91E-10* ΔVth) / 1.6e-19)-ΔNit), 
             "table_key": "gs_table1",
             "result_col": "ΔNot"
         },
