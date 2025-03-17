@@ -39,7 +39,7 @@ def handle_calculation(config):
     # 初始化表格
     if config["table_key"] not in st.session_state:
         st.session_state[config["table_key"]] = pd.DataFrame(
-            columns=["剂量(krad)", config["result_col"]]
+            columns=["剂量(krad)", config["result_cols"]]
         )
 
     # 参数输入
@@ -152,7 +152,7 @@ method_configs = {
     "calc_function": lambda Vth, Id_th:(Id_th*math.exp((1.95e-7*Vth) * (1.95e-7*Vth)**-0.5) / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5)),
            
     "table_key": "ss_table1",
-    "result_col": ["Img"]
+    "result_cols": ["Img"]
 },
    
        
