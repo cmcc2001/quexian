@@ -138,25 +138,21 @@ method_configs = {
 
     
    "SS": {
-    "氧化物俘获电荷缺陷浓度ΔNot": { 
-        "formula": {
-            "left": r"""
-            I_d(th) = I_{do}(V_d) \cdot e^{\beta V_{th}} \cdot (\beta V_{th})^{-1/2}
-            """,
-            "right": r"""
-            I_{mg} = I_{do}(V_d) \cdot e^{\beta \frac{V_{th}}{2}} \cdot \left(\beta \frac{V_{th}}{2}\right)^{-1/2}
-            """
-        },
-        "inputs": [
-            {"label": "输入Vth（单位：V）", "key": "Vth", "default": 1.0},
-            {"label": "输入Id_th（单位：A）", "key": "Id_th", "default": 1e-6, "format": "%e"}
-        ],
-        "calc_function": lambda Vth, Id_th: calculate_ss_parameters(Vth, Id_th),
-        "table_key": "ss_table1",
-        "result_cols": ["Ido_Vd", "Img"]
-    }
-}
-
+       "氧化物俘获电荷缺陷浓度ΔNot": { 
+    "formula": r"""
+    \begin{aligned}
+    I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}} \\
+    I_{mg}=I_{do}\left(V_d\right)e^{\left(\beta\frac{V_{th}}{2}\right)\bullet\left(\beta\frac{V_{th}}{2}\right)^{-1/2}}
+    \end{aligned}
+    """,
+    "inputs": [
+        {"label": "输入Vth（单位：V）", "key": "Vth", "default": 1.0},
+        {"label": "输入Id_th（单位：A）", "key": "Id_th", "default": 1e-6, "format": "%e"}
+    ],
+    "calc_function": lambda Vth, Id_th: Id_th / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5),
+    "table_key": "ss_table1",
+    "result_col": ["Ido_Vd"]
+},
    
        
         "界面态陷阱浓度ΔNit": {  # 示例配置，根据实际需求修改
