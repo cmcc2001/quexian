@@ -171,16 +171,17 @@ method_configs = {
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"\Delta V_{ot}=\frac{q\Delta N_{ot}}{C_{ox}}",
-            "inputs": [{
-                "label": "输入ΔVth（单位：V）",
+            "inputs": [
+               
+                { "label": "输入ΔVth（单位：V）",
                 "key": "ΔVth",
-                "default": 1.0     
-            }
-                      {
-                "label": "输入ΔNit（单位：cm-2）",
+                "default": 1.0 }    
+            
+                     
+                 {"label": "输入ΔNit（单位：cm-2）",
                 "key": "ΔNit",
-                "default": 1.0     
-            }],
+                "default": 1.0}     
+            ],
             "calc_function": lambda ΔVth,ΔNit: (((6.91E-10* ΔVth) / 1.6e-19)-ΔNit), 
             "table_key": "gs_table1",
             "result_col": "ΔNot"
