@@ -36,10 +36,10 @@ def handle_calculation(config):
     st.write("求解公式：")
     st.latex(config["formula"])
 
-    # 初始化表格
+    # 初始化表格（修改列初始化）
     if config["table_key"] not in st.session_state:
         st.session_state[config["table_key"]] = pd.DataFrame(
-            columns=["剂量(krad)", config["result_col"]]
+            columns=["剂量(krad)"] + config["result_cols"]
         )
 
     # 参数输入
@@ -52,44 +52,41 @@ def handle_calculation(config):
             format=param.get('format', "%f")
         )
 
-    # 计算功能
-    if st.button("计算"):
+   if st.button("计算"):
         try:
-            result = config["calc_function"](**input_values)
-            new_row = {
-                "剂量(krad)": "",
-                config["result_col"]: result
-            }
-            st.session_state[config["table_key"]] = pd.concat([
-                st.session_state[config["table_key"]],
-                pd.DataFrame([new_row])
-            ], ignore_index=True)
-        except Exception as e:
-            st.error(f"计算出错：{e}")
+            results = config["calc_function"](**input_values)
+            new_row = {"剂量(krad)": ""}
+            for col, value in zip(config["result_cols"], results):
+                new_row[col] = value
+            # ... [保持表格更新逻辑]
 
-    # 表格编辑
+    # 表格编辑（动态生成列）
     st.write("编辑表格内容：")
     updated_data = []
     df = st.session_state[config["table_key"]]
     
     for index, row in df.iterrows():
-        cols = st.columns(2)
+        cols = st.columns(len(config["result_cols"]) + 1)
+        
+        # 剂量输入
         with cols[0]:
             dose = st.text_input(
                 f"剂量(krad) [行{index+1}]",
                 value=row["剂量(krad)"],
                 key=f"dose_{config['table_key']}_{index}"
             )
-        with cols[1]:
-            val = st.number_input(
-                f"{config['result_col']} [行{index+1}]",
-                value=row[config['result_col']],
-                key=f"val_{config['table_key']}_{index}"
-            )
-        updated_data.append({
-            "剂量(krad)": dose,
-            config['result_col']: val
-        })
+        
+        # 动态生成结果列
+        row_data = {"剂量(krad)": dose}
+        for i, col in enumerate(config["result_cols"]):
+            with cols[i+1]:
+                val = st.number_input(
+                    f"{col} [行{index+1}]",
+                    value=row[col],
+                    key=f"{col}_{config['table_key']}_{index}"
+                )
+                row_data[col] = val
+        updated_data.append(row_data)
     
     st.session_state[config["table_key"]] = pd.DataFrame(updated_data)
     
@@ -148,12 +145,17 @@ method_configs = {
     """,
     "inputs": [
         {"label": "输入Vth（单位：V）", "key": "Vth", "default": 1.0},
-        {"label": "输入Id_th（单位：A）", "key": "Id_th", "default": 1e-6, }
+        {"label": "输入Id_th（单位：A）", "key": "Id_th", "default": 1e-6},
+        {"label": "电压变化ΔV_ot (V)", "key": "ΔV_ot", "default": 0.1}
     ],
-    "calc_function": lambda Vth, Id_th:(Id_th*math.exp((1.95e-7*Vth) * (1.95e-7*Vth)**-0.5) / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5)),
-           
-    "table_key": "ss_table1",
-    "result_col": "Img"
+     "calc_function": lambda Vth, Id_th, Cox, ΔV_ot: [
+            # 计算Img
+            Id_th * math.exp((1.95e-7*Vth) * (1.95e-7*Vth)**-0.5) / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5),
+            # 计算ΔNot
+            (-Cox * ΔV_ot) / 1.6e-19
+        ],
+        "table_key": "ss_table1",
+        "result_cols": "Img", "ΔNot"
 },
    
        
