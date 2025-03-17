@@ -135,7 +135,7 @@ method_configs = {
             "result_col": "ΔNit"
         }
     },
-    β=3.89E-7
+
     
     "SS": {
         "氧化物俘获电荷缺陷浓度ΔNot": { 
@@ -149,7 +149,7 @@ method_configs = {
                 {"label": "输入Vth（单位：V）", "key": "th", "default": 1},
                 {"label": "输入Id(th)（单位：A）", "key": "Id(th)", "default": 1}
             ],
-            "calc_function": lambda A, B, C: (A * B) / C,
+            "calc_function": lambda Vth, Id(th): (Id(th))/(math.exp(())),
             "table_key": "ss_table1",
             "result_col": "ΔX"
         },
