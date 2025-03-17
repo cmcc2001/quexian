@@ -167,7 +167,7 @@ method_configs = {
             "table_key": "ss_table2",
             "result_col": "ΔY"
         }
-    }
+    },
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"\mathrm{\Delta}N_{ot}=\frac{Cox\cdot\mathrm{\Delta}V_{mg}}{q}",
