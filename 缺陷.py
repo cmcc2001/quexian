@@ -140,8 +140,10 @@ method_configs = {
    "SS": {
        "氧化物俘获电荷缺陷浓度ΔNot": { 
     "formula": r"""
-    I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}}//
+    \begin{aligned}
+    I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}} \\
     I_{mg}=I_{do}\left(V_d\right)e^{\left(\beta\frac{V_{th}}{2}\right)\bullet\left(\beta\frac{V_{th}}{2}\right)^{-1/2}}
+    \end{aligned}
     """,
     "inputs": [
         {"label": "输入Vth（单位：V）", "key": "Vth", "default": 1.0},
@@ -150,7 +152,7 @@ method_configs = {
     "calc_function": lambda Vth, Id_th:(Id_th*math.exp((1.95e-7*Vth) * (1.95e-7*Vth)**-0.5) / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5)),
            
     "table_key": "ss_table1",
-    "result_col": ["Img"]
+    "result_col": "Img"
 },
    
        
