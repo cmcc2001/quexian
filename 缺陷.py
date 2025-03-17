@@ -130,7 +130,7 @@ method_configs = {
                 "key": "ΔIpeak",
                 "default": 1.0        
             }],
-            "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6E-19 * 6.16E-6 * 1.5E10 * 1 * 1E-7 * math.exp((1.6e-19*0.5)/(2*1.38e-23*298))),
+            "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6E-19 * 6.16E-6 * 1.5E10 * 1E-16 * 1E-7 * math.exp((1.6e-19*0.5)/(2*1.38e-23*298))),
             "table_key": "gs_table2",
             "result_col": "ΔNit"
         }
