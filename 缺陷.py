@@ -138,34 +138,37 @@ method_configs = {
 
     
    "SS": {
-       "氧化物俘获电荷缺陷浓度ΔNot": { 
-    "formula": r"""
-    \begin{aligned}
-    I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}} \\
-    I_{mg}=I_{do}\left(V_d\right)e^{\left(\beta\frac{V_{th}}{2}\right)\bullet\left(\beta\frac{V_{th}}{2}\right)^{-1/2}}\\
-\Delta V_{ot}=\frac{-q\Delta N_{ot}}{C_{ox}}
-    \end{aligned}
-    """,
-    "inputs": [
-        {"label": "输入Vth（单位：V）", "key": "Vth", "default": 1.0},
-        {"label": "输入Id_th（单位：A）", "key": "Id_th", "default": 1e-6, }
-    ],
-    "calc_function": lambda Vth, Id_th:(Id_th*math.exp((1.95e-7*Vth) * (1.95e-7*Vth)**-0.5) / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5)),
-           
-    "table_key": "ss_table1",
-    "result_col": "Img"
-},
-   
-       
-        "界面态陷阱浓度ΔNit": {  # 示例配置，根据实际需求修改
-            "formula": r"\Delta Y = \sqrt{D \cdot E}",
+        "氧化物俘获电荷缺陷浓度ΔNot": {
+            "formula": r"""
+            \begin{aligned}
+            \Delta V_{ot} &= V_{mg1} - V_{mg2} \\
+            \Delta N_{ot} &= \frac{C_{ox} \cdot \Delta V_{ot}}{q}
+            \end{aligned}
+            """,
             "inputs": [
-                {"label": "参数D", "key": "D", "default": 9.0},
-                {"label": "参数E", "key": "E", "default": 4.0}
+                {"label": "辐照前Vmg1 (V)", "key": "vmg1", "default": 0.5},
+                {"label": "辐照后Vmg2 (V)", "key": "vmg2", "default": 0.4},
+                {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
             ],
-            "calc_function": lambda D, E: math.sqrt(D * E),
+            "calc_function": lambda vmg1, vmg2, cox: (cox * (vmg1 - vmg2)) / 1.6e-19,
+            "table_key": "ss_table1",
+            "result_col": "ΔNot (cm⁻²)"
+        },
+        "界面态陷阱浓度ΔNit": {
+            "formula": r"""
+            \begin{aligned}
+            \Delta V_{it} &= \Delta V_{th} - \Delta V_{ot} \\
+            \Delta N_{it} &= \frac{C_{ox} \cdot \Delta V_{it}}{q}
+            \end{aligned}
+            """,
+            "inputs": [
+                {"label": "阈值电压变化ΔVth (V)", "key": "dvth", "default": 0.15},
+                {"label": "ΔVot (V)", "key": "dvot", "default": 0.1},
+                {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
+            ],
+            "calc_function": lambda dvth, dvot, cox: (cox * (dvth - dvot)) / 1.6e-19,
             "table_key": "ss_table2",
-            "result_col": "ΔY"
+            "result_col": "ΔNit (cm⁻²)"
         }
     },
     "CP": {
