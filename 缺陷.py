@@ -137,124 +137,37 @@ method_configs = {
     },
 
     
-    "SS": {
-        "氧化物俘获电荷缺陷浓度ΔNot": {
-            "formula": r"""
-            \begin{aligned}
-            &\text{1. 计算阈值电压 } V_{th} = \arg\max\left(\frac{d^2I_d}{dV_g^2}\right) \\
-            &\text{2. 计算 } I_{do}(V_d) = \frac{I_d(th)}{e^{\beta V_{th} \cdot (\beta V_{th})^{-1/2}}} \\
-            &\text{3. 计算 } I_{mg} = I_{do}(V_d)e^{\beta \frac{V_{th}}{2} \cdot \left(\beta \frac{V_{th}}{2}\right)^{-1/2} \\
-            &\text{4. 确定 } V_{mg} \text{ 为 } I_{mg} \text{对应的栅压} \\
-            &\Delta N_{ot} = \frac{C_{ox}(V_{mg1} - V_{mg2})}{q}
-            \end{aligned}
-            """,
+   "SS": {
+       "氧化物俘获电荷缺陷浓度ΔNot": { 
+    "formula": r"""
+    \begin{aligned}
+    I_d\left(th\right)=I_{do}\left(V_d\right)e^{\left(\beta V_{th}\right)\bullet\left(\beta V_{th}\right)^{-1/2}} \\
+    I_{mg}=I_{do}\left(V_d\right)e^{\left(\beta\frac{V_{th}}{2}\right)\bullet\left(\beta\frac{V_{th}}{2}\right)^{-1/2}}\\
+\Delta V_{ot}=\frac{-q\Delta N_{ot}}{C_{ox}}
+    \end{aligned}
+    """,
+    "inputs": [
+        {"label": "输入Vth（单位：V）", "key": "Vth", "default": 1.0},
+        {"label": "输入Id_th（单位：A）", "key": "Id_th", "default": 1e-6, }
+    ],
+    "calc_function": lambda Vth, Id_th:(Id_th*math.exp((1.95e-7*Vth) * (1.95e-7*Vth)**-0.5) / math.exp((3.89e-7*Vth) * (3.89e-7*Vth)**-0.5)),
+           
+    "table_key": "ss_table1",
+    "result_col": "Img"
+},
+   
+       
+        "界面态陷阱浓度ΔNit": {  # 示例配置，根据实际需求修改
+            "formula": r"\Delta Y = \sqrt{D \cdot E}",
             "inputs": [
-                {"label": "辐照前数据文件", "key": "pre_file", "type": "file"},
-                {"label": "辐照后数据文件", "key": "post_file", "type": "file"},
-                {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
+                {"label": "参数D", "key": "D", "default": 9.0},
+                {"label": "参数E", "key": "E", "default": 4.0}
             ],
-            "calc_function": ss_calculate_not,
-            "table_key": "ss_table1",
-            "result_col": "ΔNot (cm⁻²)",
-            "custom_ui": ss_oxide_ui  # 专用界面组件
-        },
-        "界面态陷阱浓度ΔNit": {
-            "formula": r"""
-            \begin{aligned}
-            &\Delta V_{th} = V_{th2} - V_{th1} \\
-            &\Delta V_{ot} = V_{mg2} - V_{mg1} \\
-            &\Delta N_{it} = \frac{C_{ox}(\Delta V_{th} - \Delta V_{ot})}{q}
-            \end{aligned}
-            """,
-            "inputs": [
-                {"label": "阈值电压变化ΔVth (V)", "key": "dvth", "type": "auto"},
-                {"label": "ΔVot (V)", "key": "dvot", "type": "auto"},
-                {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
-            ],
-            "calc_function": ss_calculate_nit,
+            "calc_function": lambda D, E: math.sqrt(D * E),
             "table_key": "ss_table2",
-            "result_col": "ΔNit (cm⁻²)",
-            "custom_ui": ss_interface_ui
+            "result_col": "ΔY"
         }
-    }
-}
-
-# 新增SS专用函数
-def ss_oxide_ui(config):
-    """氧化物俘获电荷专用界面"""
-    st.header("SS测试 - 氧化物俘获电荷分析")
-    
-    # 文件上传
-    pre_file = st.file_uploader("上传辐照前数据", type=["csv","xlsx"], 
-                              key="ss_pre_upload")
-    post_file = st.file_uploader("上传辐照后数据", type=["csv","xlsx"],
-                               key="ss_post_upload")
-    
-    if pre_file and post_file:
-        # 解析数据
-        pre_data = parse_ss_file(pre_file)
-        post_data = parse_ss_file(post_file)
-        
-        # 显示分析结果
-        with st.expander("辐照前参数"):
-            show_ss_analysis(pre_data)
-            
-        with st.expander("辐照后参数"):
-            show_ss_analysis(post_data)
-        
-        # 自动计算ΔVmg
-        dvmg = post_data['vmg'] - pre_data['vmg']
-        st.session_state['auto_dvmg'] = dvmg
-        
-        # 保存到参数系统
-        st.session_state['ss_params'] = {
-            'pre': pre_data,
-            'post': post_data,
-            'cox': config['inputs'][2]['default']
-        }
-
-def ss_calculate_not(cox):
-    """氧化物俘获电荷计算"""
-    params = st.session_state.get('ss_params')
-    if not params:
-        raise ValueError("请先上传并分析数据")
-    
-    dvmg = params['post']['vmg'] - params['pre']['vmg']
-    return (cox * dvmg) / 1.6e-19
-
-def parse_ss_file(file):
-    """解析SS数据文件"""
-    # 与之前实现的文件解析逻辑一致
-    # 返回包含vth, vmg, ido_vd等参数的字典
-    return analysis_results
-
-def show_ss_analysis(data):
-    """显示单次分析结果"""
-    cols = st.columns(3)
-    cols[0].metric("Vth", f"{data['vth']:.3f} V")
-    cols[1].metric("Vmg", f"{data['vmg']:.3f} V")
-    cols[2].metric("Ido(Vd)", f"{data['ido_vd']:.2e} A")
-    
-    # 绘制特征曲线
-    fig = plot_ss_curves(data)
-    st.pyplot(fig)
-
-# 主逻辑调整
-if formula_type in method_configs:
-    config = method_configs[formula_type][defect_type]
-    
-    if "custom_ui" in config:  # SS专用处理
-        config["custom_ui"](config)
-        if st.button("计算", key="ss_calc"):
-            try:
-                result = config["calc_function"](**get_ss_params(config))
-                update_table(config, result)
-            except Exception as e:
-                st.error(str(e))
-        show_data_table(config)
-    else:  # 其他方法原有逻辑
-        handle_calculation(config)
-      
+    },
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"\Delta V_{ot}=\frac{q\Delta N_{ot}}{C_{ox}}",
@@ -277,8 +190,8 @@ if formula_type in method_configs:
             "table_key": "gs_table2",
             "result_col": "ΔNit"
         }
-    }
-
+    },
+}
 
 # 主程序逻辑
 if formula_type in method_configs:
