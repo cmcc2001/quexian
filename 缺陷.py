@@ -141,18 +141,22 @@ method_configs = {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"""
             \begin{aligned}
-            \Delta V_{ot} &= V_{mg1} - V_{mg2} \\
-            \Delta N_{ot} &= \frac{C_{ox} \cdot \Delta V_{ot}}{q}
+            &1.\ 计算阈值电压\ V_{th} = \arg\max\left(\frac{d^2I_d}{dV_g^2}\right) \\
+            &2.\ 计算\ I_{do}(V_d) = \frac{I_d(th)}{e^{\beta V_{th}} \cdot (\beta V_{th})^{-1/2} \\
+            &3.\ 计算\ I_{mg} = I_{do}(V_d) \cdot e^{\beta \frac{V_{th}}{2}} \cdot \left(\beta \frac{V_{th}}{2}\right)^{-1/2} \\
+            &4.\ 确定\ V_{mg}\ 为\ I_{mg}\ 对应的栅压 \\
+            &5.\ \Delta N_{ot} = \frac{C_{ox}(V_{mg1} - V_{mg2})}{q}
             \end{aligned}
             """,
             "inputs": [
-                {"label": "辐照前Vmg1 (V)", "key": "vmg1", "default": 0.5},
-                {"label": "辐照后Vmg2 (V)", "key": "vmg2", "default": 0.4},
+                {"label": "辐照前数据文件", "key": "pre_file", "type": "file"},
+                {"label": "辐照后数据文件", "key": "post_file", "type": "file"},
                 {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
             ],
-            "calc_function": lambda vmg1, vmg2, cox: (cox * (vmg1 - vmg2)) / 1.6e-19,
+            "calc_function": ss_calculate_not,
             "table_key": "ss_table1",
-            "result_col": "ΔNot (cm⁻²)"
+            "result_col": "ΔNot (cm⁻²)",
+            "custom_ui": ss_oxide_ui
         },
         "界面态陷阱浓度ΔNit": {
             "formula": r"""
