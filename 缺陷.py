@@ -278,7 +278,7 @@ if formula_type in method_configs:
             "result_col": "ΔNit"
         }
     },
-}
+
 
 # 主程序逻辑
 if formula_type in method_configs:
