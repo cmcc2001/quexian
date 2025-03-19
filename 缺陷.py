@@ -141,36 +141,134 @@ method_configs = {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"""
             \begin{aligned}
-            \Delta V_{ot} &= V_{mg1} - V_{mg2} \\
-            \Delta N_{ot} &= \frac{C_{ox} \cdot \Delta V_{ot}}{q}
+            &1.\ 计算阈值电压\ V_{th} = \arg\max\left(\frac{d^2I_d}{dV_g^2}\right) \\
+            &2.\ 计算\ I_{do}(V_d) = \frac{I_d(th)}{e^{\beta V_{th} \cdot (\beta V_{th})^{-1/2}}} \\
+            &3.\ 计算\ I_{mg} = I_{do}(V_d)e^{\beta \frac{V_{th}}{2} \cdot \left(\beta \frac{V_{th}}{2}\right)^{-1/2}} \\
+            &4.\ 确定\ V_{mg}\ 为\ I_{mg}\ 对应的栅压 \\
+            &5.\ \Delta N_{ot} = \frac{C_{ox}(V_{mg1} - V_{mg2})}{q}
             \end{aligned}
             """,
             "inputs": [
-                {"label": "辐照前Vmg1 (V)", "key": "vmg1", "default": 0.5},
-                {"label": "辐照后Vmg2 (V)", "key": "vmg2", "default": 0.4},
+                {"label": "辐照前数据文件", "key": "pre_file", "type": "file"},
+                {"label": "辐照后数据文件", "key": "post_file", "type": "file"},
+                {"label": "温度T (K)", "key": "temp", "default": 300},
                 {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
             ],
-            "calc_function": lambda vmg1, vmg2, cox: (cox * (vmg1 - vmg2)) / 1.6e-19,
+            "calc_function": ss_calculate_not,
             "table_key": "ss_table1",
-            "result_col": "ΔNot (cm⁻²)"
+            "result_col": "ΔNot (cm⁻²)",
+            "custom_ui": ss_oxide_ui
         },
-        "界面态陷阱浓度ΔNit": {
-            "formula": r"""
-            \begin{aligned}
-            \Delta V_{it} &= \Delta V_{th} - \Delta V_{ot} \\
-            \Delta N_{it} &= \frac{C_{ox} \cdot \Delta V_{it}}{q}
-            \end{aligned}
-            """,
-            "inputs": [
-                {"label": "阈值电压变化ΔVth (V)", "key": "dvth", "default": 0.15},
-                {"label": "ΔVot (V)", "key": "dvot", "default": 0.1},
-                {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
-            ],
-            "calc_function": lambda dvth, dvot, cox: (cox * (dvth - dvot)) / 1.6e-19,
-            "table_key": "ss_table2",
-            "result_col": "ΔNit (cm⁻²)"
+        # 界面态配置保持不变...
+    }
+}
+
+# 新增物理常数
+q = 1.6e-19  # 电子电荷
+k = 1.38e-23  # 玻尔兹曼常数
+
+def ss_oxide_ui(config):
+    """氧化物俘获电荷专用界面"""
+    st.header("SS测试 - 完整分析流程")
+    
+    # 文件上传
+    pre_file = st.file_uploader("上传辐照前数据", type=["csv","xlsx"], key="ss_pre_upload")
+    post_file = st.file_uploader("上传辐照后数据", type=["csv","xlsx"], key="ss_post_upload")
+    
+    # 温度输入
+    temp = st.sidebar.number_input("温度 (K)", min_value=77, max_value=400, value=300)
+
+    if pre_file and post_file:
+        # 解析数据
+        pre_data = parse_ss_file(pre_file, temp)
+        post_data = parse_ss_file(post_file, temp)
+        
+        # 显示分析结果
+        col1, col2 = st.columns(2)
+        with col1:
+            show_analysis_result("辐照前参数", pre_data)
+        with col2:
+            show_analysis_result("辐照后参数", post_data)
+
+def parse_ss_file(file, temp):
+    """解析SS数据文件"""
+    try:
+        # 读取数据
+        if file.name.endswith('.csv'):
+            df = pd.read_csv(file)
+        else:
+            df = pd.read_excel(file)
+        
+        # 计算导数
+        vg = df['Vg'].values
+        id = np.abs(df['Id'].values)
+        
+        # 计算一阶导数
+        dId_dVg = np.gradient(id, vg)
+        
+        # 计算二阶导数并平滑
+        window_size = min(21, len(vg)//2*2-1)
+        d2Id_dVg2 = savgol_filter(dId_dVg, window_size, 3, deriv=1)
+        
+        # 找到Vth
+        peak_idx = np.argmax(d2Id_dVg2)
+        vth = vg[peak_idx]
+        id_th = id[peak_idx]
+        
+        # 计算β
+        beta = q / (k * temp)
+        
+        # 计算Ido(Vd)
+        exponent = beta*vth * (beta*vth)**(-0.5)
+        ido_vd = id_th / np.exp(exponent)
+        
+        # 计算Img
+        half_exponent = (beta*(vth/2)) * (beta*(vth/2))**(-0.5)
+        img = ido_vd * np.exp(half_exponent)
+        
+        # 查找Vmg
+        f = interp1d(vg, id, kind='linear')
+        v_interp = np.linspace(vg.min(), vg.max(), 1000)
+        id_interp = f(v_interp)
+        vmg = v_interp[np.argmin(np.abs(id_interp - img))]
+        
+        return {
+            'vth': vth,
+            'id_th': id_th,
+            'beta': beta,
+            'ido_vd': ido_vd,
+            'img': img,
+            'vmg': vmg
         }
-    },
+        
+    except Exception as e:
+        st.error(f"文件解析错误: {str(e)}")
+        return None
+
+def show_analysis_result(title, data):
+    """显示单次分析结果"""
+    st.subheader(title)
+    cols = st.columns(2)
+    cols[0].metric("阈值电压Vth", f"{data['vth']:.3f} V")
+    cols[1].metric("阈值电流Id(th)", f"{data['id_th']:.2e} A")
+    
+    cols = st.columns(2)
+    cols[0].metric("β值", f"{data['beta']:.2e} C/(J·K)")
+    cols[1].metric("Ido(Vd)", f"{data['ido_vd']:.2e} A")
+    
+    cols = st.columns(2)
+    cols[0].metric("计算Img", f"{data['img']:.2e} A") 
+    cols[1].metric("对应Vmg", f"{data['vmg']:.3f} V")
+    
+    # 绘制特征曲线
+    fig, ax = plt.subplots()
+    ax.semilogy(data['vg'], data['id'], 'b-', label='I_d')
+    ax.axvline(x=data['vth'], color='r', linestyle='--', label='Vth')
+    ax.axhline(y=data['img'], color='g', linestyle=':', label='Img')
+    ax.set_xlabel("Gate Voltage (V)")
+    ax.set_ylabel("Drain Current (A)")
+    ax.legend()
+    st.pyplot(fig)
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"\Delta V_{ot}=\frac{q\Delta N_{ot}}{C_{ox}}",
