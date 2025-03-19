@@ -277,7 +277,7 @@ if formula_type in method_configs:
             "table_key": "gs_table2",
             "result_col": "ΔNit"
         }
-    },
+    }
 
 
 # 主程序逻辑
