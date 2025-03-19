@@ -254,6 +254,7 @@ if formula_type in method_configs:
         show_data_table(config)
     else:  # 其他方法原有逻辑
         handle_calculation(config)
+         },
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"\Delta V_{ot}=\frac{q\Delta N_{ot}}{C_{ox}}",
