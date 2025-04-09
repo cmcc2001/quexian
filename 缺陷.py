@@ -140,10 +140,7 @@ method_configs = {
   "SS": {
     "氧化物俘获电荷缺陷浓度ΔNot": {
         "formula": r"""
-        \begin{aligned}
-        \Delta V_{ot} &= V_{mg1} - V_{mg2} \\
-        \Delta N_{ot} &= \frac{C_{ox} \cdot \Delta V_{ot}}{q}
-        \end{aligned}
+        I_{mg}=\mu_p\left(\frac{w}{l}\right)C_{ox}\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right)
         """,
         "inputs": [
             {"label": "辐照前Vmg1 (V)", "key": "vmg1", "default": 0.5},
