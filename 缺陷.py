@@ -138,22 +138,31 @@ method_configs = {
 
     
     
-    "SS":"氧化物俘获电荷缺陷浓度ΔNot": {
-        "formula": r"""
-        I_{mg}=x\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right)
-        """,
-        "inputs": [
-            {"label": "x", "key": "x", "default": 0.5},
-        ],
-        "calc_function": lambda x: (
-            x * 0.599 / (2 * 38.61**2)
-            * ((1.5e10)**2 / 5e14)
-            * (1 - math.exp(-38.61 * 1))
-            * ((math.e * 38.61 * 0.288) / ((38.61 * 0.288 - 1)**0.5))
-        ) / 1.6e-19,
-        "table_key": "ss_table1",
-        "result_col": "ΔNot (cm⁻²)"
+   "SS": {
+        "氧化物俘获电荷缺陷浓度ΔNot": {
+            "formula": r"I_{mg}=x\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right)",
+            "inputs": [{
+                "label": "输入x",
+                "key": "x",
+                "default": 1.0
+            }],
+            "calc_function": lambda x: (6.91E-10* ΔVmg) / 1.6e-19, 
+            "table_key": "gs_table1",
+            "result_col": "ΔNot"
+        },
+        "界面态陷阱浓度ΔNit": {
+            "formula": r"\Delta N_{it}=\frac{2\Delta I_{peak}}{q\cdot S_{peak}\cdot n_i\cdot\sigma\cdot\nu_{th}exp{\left(\frac{qV_{BE}}{2kT}\right)}}",
+            "inputs": [{
+                "label": "输入 ΔIpeak（单位：A）",
+                "key": "ΔIpeak",
+                "default": 1.0        
+            }],
+            "calc_function": lambda ΔIpeak: (2 * ΔIpeak) / (1.6E-19 * 6.16E-6 * 1.5E10 * 1E-16 * 1E-7 * math.exp((1.6e-19*0.5)/(2*1.38e-23*298))),
+            "table_key": "gs_table2",
+            "result_col": "ΔNit"
+        }
     },
+
 
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
