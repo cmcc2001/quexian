@@ -137,57 +137,24 @@ method_configs = {
     },
 
     
-  "SS": {
-    "氧化物俘获电荷缺陷浓度ΔNot": {
-        "formula": r"""
-        I_{mg}=\mu_p\left(\frac{w}{l}\right)C_{ox}\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right)
-        """,
-        "inputs": [
-            {"label": "辐照前Vmg1 (V)", "key": "vmg1", "default": 0.5},
-            {"label": "辐照后Vmg2 (V)", "key": "vmg2", "default": 0.4},
-            {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
-        ],
-        "calc_function": lambda vmg1, vmg2, cox: (cox * (vmg1 - vmg2)) / 1.6e-19,
-        "table_key": "ss_table1",
-        "result_col": "ΔNot (cm⁻²)"
-    },
-    "界面态陷阱浓度ΔNit": {
-        "formula": r"""
-        \begin{aligned}
-        \Delta V_{it} &= \Delta V_{th} - \Delta V_{ot} \\
-        \Delta N_{it} &= \frac{C_{ox} \cdot \Delta V_{it}}{q}
-        \end{aligned}
-        """,
-        "inputs": [
-            {"label": "阈值电压变化ΔVth (V)", "key": "dvth", "default": 0.15},
-            {"label": "ΔVot (V)", "key": "dvot", "default": 0.1},
-            {"label": "氧化层电容Cox (F/cm²)", "key": "cox", "default": 6.91e-8}
-        ],
-        "calc_function": lambda dvth, dvot, cox: (cox * (dvth - dvot)) / 1.6e-19,
-        "table_key": "ss_table2",
-        "result_col": "ΔNit (cm⁻²)"
-    },
-    "Ido(Vd)": {
-        "formula": r"Idth = Ido Vd e^{\beta Vth} \cdot \beta Vth - 1/2",
-        "inputs": [
-            {"label": "输入 Vd (V)", "key": "vd", "default": 1.0},
-            {"label": "输入 Vth (V)", "key": "vth", "default": 1.0}
-        ],
-        "calc_function": lambda vd, vth: (vd * math.exp(0.026 * vth) * (0.026 * vth - 0.5)),
-        "table_key": "ss_table_ido",
-        "result_col": "Ido(Vd)"
-    },
-    "Img": {
-        "formula": r"Img = Ido Vd e^{\beta Vth^2} \cdot \beta Vth^2 - 1/2",
-        "inputs": [
-            {"label": "输入 Vd (V)", "key": "vd", "default": 1.0},
-            {"label": "输入 Vth (V)", "key": "vth", "default": 1.0}
-        ],
-        "calc_function": lambda vd, vth: (vd * math.exp(0.026 * (vth**2)) * (0.026 * (vth**2) - 0.5)),
-        "table_key": "ss_table_img",
-        "result_col": "Img"
-    }
+    
+ "氧化物俘获电荷缺陷浓度ΔNot": {
+    "formula": r"""
+    I_{mg}=x\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right)
+    """,
+    "inputs": [
+        {"label": "x", "key": "x", "default": 0.5},
+    ],
+    "calc_function": lambda x: (
+        x * 0.599 / (2 * 38.61**2)
+        * ((1.5e10)**2 / 5e14)
+        * (1 - math.exp(-38.61 * 1))
+        * ((math.e * 38.61 * 0.288) / ((38.61 * 0.288 - 1)**0.5))
+    ) / 1.6e-19,
+    "table_key": "ss_table1",
+    "result_col": "ΔNot (cm⁻²)"
 },
+
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"\Delta V_{ot}=\frac{q\Delta N_{ot}}{C_{ox}}",
