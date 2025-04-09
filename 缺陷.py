@@ -146,7 +146,7 @@ method_configs = {
                 "key": "x",
                 "default": 1.0
             }],
-            "calc_function": lambda x: x*(0.599/), 
+            "calc_function": lambda x: x*(0.599/1), 
             "table_key": "gs_table1",
             "result_col": "ΔNot"
         },
