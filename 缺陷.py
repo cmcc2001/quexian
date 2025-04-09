@@ -138,22 +138,22 @@ method_configs = {
 
     
     
- "氧化物俘获电荷缺陷浓度ΔNot": {
-    "formula": r"""
-    I_{mg}=x\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right)
-    """,
-    "inputs": [
-        {"label": "x", "key": "x", "default": 0.5},
-    ],
-    "calc_function": lambda x: (
-        x * 0.599 / (2 * 38.61**2)
-        * ((1.5e10)**2 / 5e14)
-        * (1 - math.exp(-38.61 * 1))
-        * ((math.e * 38.61 * 0.288) / ((38.61 * 0.288 - 1)**0.5))
-    ) / 1.6e-19,
-    "table_key": "ss_table1",
-    "result_col": "ΔNot (cm⁻²)"
-},
+    "SS":"氧化物俘获电荷缺陷浓度ΔNot": {
+        "formula": r"""
+        I_{mg}=x\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right)
+        """,
+        "inputs": [
+            {"label": "x", "key": "x", "default": 0.5},
+        ],
+        "calc_function": lambda x: (
+            x * 0.599 / (2 * 38.61**2)
+            * ((1.5e10)**2 / 5e14)
+            * (1 - math.exp(-38.61 * 1))
+            * ((math.e * 38.61 * 0.288) / ((38.61 * 0.288 - 1)**0.5))
+        ) / 1.6e-19,
+        "table_key": "ss_table1",
+        "result_col": "ΔNot (cm⁻²)"
+    },
 
     "CP": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
