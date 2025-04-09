@@ -137,7 +137,7 @@ method_configs = {
     },
 
     
-    \alpha=0.599，\beta=38.61，ni=1.5E10，N_A=5E14，V_{ds}=1，\emptyset_b=0.288
+    
    "SS": {
         "氧化物俘获电荷缺陷浓度ΔNot": {
             "formula": r"I_{mg}=x\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right)",
@@ -146,7 +146,7 @@ method_configs = {
                 "key": "x",
                 "default": 1.0
             }],
-            "calc_function": lambda x: x\frac{\alpha}{2\beta^2}\left(\frac{{ni}^2}{N_A}\right)\left(1-e^{-\beta V_{ds}}\right)\left(\frac{e\beta\left(\emptyset_b\right)}{\left(\beta\emptyset_b-1\right)^\frac{1}{2}}\right, 
+            "calc_function": lambda x: x*(0.599/), 
             "table_key": "gs_table1",
             "result_col": "ΔNot"
         },
